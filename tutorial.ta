@@ -1,2 +1,4 @@
 SCENE "Start"
 ASK "What is your name?"
+SCENE "Dark Room"
+Ask "Do you want to light a candle?"

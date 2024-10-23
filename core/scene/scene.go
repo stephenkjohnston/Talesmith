@@ -7,5 +7,5 @@ type Scene struct {
 }
 
 func (s *Scene) ToString() {
-	fmt.Printf("SCENE NAME: %s", s.Name)
+	fmt.Printf("SCENE NAME: %s\n", s.Name)
 }
