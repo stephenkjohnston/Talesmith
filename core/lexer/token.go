@@ -15,6 +15,7 @@ const (
 
 	// Reserved keywords
 	FUNC_ASK
+	FUNC_SCENE
 )
 
 type Token struct {
@@ -23,7 +24,8 @@ type Token struct {
 }
 
 var reservedKeywords = map[string]TokenKind{
-	"ask": FUNC_ASK,
+	"ask":   FUNC_ASK,
+	"scene": FUNC_SCENE,
 }
 
 func NewToken(kind TokenKind, literal string) Token {
@@ -57,6 +59,8 @@ func (token Token) TokenKindString() string {
 		return "string"
 	case FUNC_ASK:
 		return "func(ask)"
+	case FUNC_SCENE:
+		return "func(scene)"
 	default:
 		return fmt.Sprintf("unknown(%d)", token.Kind)
 	}
