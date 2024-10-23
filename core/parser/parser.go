@@ -1,16 +1,19 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
 	"github.com/stephenkjohnston/talesmith/core/lexer"
+	"github.com/stephenkjohnston/talesmith/core/scene"
 )
 
 type Parser struct {
 	Tokens         []lexer.Token
 	Position       int
 	PlayerResponse string
+	Scenes         []scene.Scene
 }
 
 func (p *Parser) currentToken() lexer.Token {
@@ -45,13 +48,48 @@ func NewParser(source string) *Parser {
 	}
 }
 
-func (p *Parser) Parse() {
+func (p *Parser) Parse() error {
 	for p.hasTokens() {
 		token := p.advance()
+		if token.Kind == lexer.FUNC_SCENE {
+			if err := p.handleScene(); err != nil {
+				return err
+			}
+		}
+
 		if token.Kind == lexer.FUNC_ASK {
 			p.handleAsk()
 		}
 	}
+
+	return nil
+}
+
+func (p *Parser) handleScene() error {
+	sceneToken := p.advance()
+
+	if sceneToken.Kind != lexer.STRING {
+		return errors.New("expected string after SCENE")
+	}
+
+	sceneName := p.extractQuotedContent(sceneToken.Literal)
+
+	if err := p.sceneExists(sceneName); err != nil {
+		return err
+	}
+
+	p.Scenes = append(p.Scenes, scene.Scene{Name: sceneName})
+	return nil
+}
+
+func (p *Parser) sceneExists(name string) error {
+	for _, scene := range p.Scenes {
+		if scene.Name == name {
+			return errors.New("duplicate scene name found \"" + name + "\"")
+		}
+	}
+
+	return nil
 }
 
 func (p *Parser) handleAsk() {
